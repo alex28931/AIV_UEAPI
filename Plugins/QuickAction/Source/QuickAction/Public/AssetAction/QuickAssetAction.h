@@ -29,6 +29,9 @@ public:
 	UFUNCTION(CallInEditor)
 	void FixCustomPrefix(const FString& customPrefix, const FString& customSuffix);
 
+	UFUNCTION(CallInEditor)
+	void RemoveUnused();
+
 private: 
 	TMap<UClass*, FString> prefixMap =
 	{
@@ -36,4 +39,6 @@ private:
 		{UMaterial::StaticClass(), TEXT("M_")},
 		{UMaterialInstanceConstant::StaticClass(), TEXT("MI_")}
 	};
+
+	void FixRedirectors();
 };
