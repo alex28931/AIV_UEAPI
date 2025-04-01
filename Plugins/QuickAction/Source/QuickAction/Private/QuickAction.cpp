@@ -2,6 +2,9 @@
 
 #include "QuickAction.h"
 #include "ContentBrowserModule.h"
+#include "Styling/SlateStyle.h"           
+#include "Styling/SlateStyleRegistry.h"                
+#include "SlateCore.h" 
 
 #define LOCTEXT_NAMESPACE "FQuickActionModule"
 DEFINE_LOG_CATEGORY(LogQuickActions);
@@ -42,15 +45,42 @@ void FQuickActionModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 	MenuBuilder.AddMenuEntry(
 		FText::FromString(TEXT("Delete UnusedAsset")),
 		FText::FromString(TEXT("Delete UnusedAsset in folder")),
-		FSlateIcon(),
+		FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Delete"),
 		FExecuteAction::CreateRaw(this, &FQuickActionModule::OnDeleteUnusedAssetClicked)
 	);
 }
 
 void FQuickActionModule::OnDeleteUnusedAssetClicked()
 {
+	
 }
+void FQuickActionModule::RegisterPngIcons(const FString& StyleSetName, const TMap<FString, FString>& IconMap, const FString& IconFolderPath)
+{
+    const ISlateStyle* ExistingStyle = FSlateStyleRegistry::FindSlateStyle(FName(*StyleSetName));
+    if (!ExistingStyle)
+    {
+        TSharedRef<FSlateStyleSet> NewStyleSet = MakeShareable(new FSlateStyleSet(FName(*StyleSetName)));
+        NewStyleSet->SetContentRoot(IconFolderPath);
 
+        for (const auto& IconPair : IconMap)
+        {
+            const FString& IconName = IconPair.Key;
+            const FString& IconFileName = IconPair.Value;
+
+            NewStyleSet->Set(*IconName, new FSlateImageBrush(
+                NewStyleSet->RootToContentDir(IconFileName, TEXT(".png")),
+                FVector2D(16.0f, 16.0f)
+            ));
+        }
+
+        // Registra il nuovo stile
+        FSlateStyleRegistry::RegisterSlateStyle(*NewStyleSet);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Style '%s' already exists. No changes made."), *StyleSetName);
+    }
+}
 #pragma endregion
 void FQuickActionModule::ShutdownModule()
 {

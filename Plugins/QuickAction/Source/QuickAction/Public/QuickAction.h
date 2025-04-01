@@ -21,5 +21,6 @@ private:
 	TSharedRef<FExtender> CustomCBExtender(const TArray<FString>& SelectedPaths);
 	void AddCBMenuEntry(FMenuBuilder& MenuBuilder);
 	void OnDeleteUnusedAssetClicked();
+	void RegisterPngIcons(const FString& StyleSetName, const TMap<FString, FString>& IconMap, const FString& IconFolderPath);
 #pragma endregion
 };
