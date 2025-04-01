@@ -4,7 +4,13 @@
 #include "ContentBrowserModule.h"
 #include "Styling/SlateStyle.h"           
 #include "Styling/SlateStyleRegistry.h"                
-#include "SlateCore.h" 
+#include "SlateCore.h"
+#include "../HeaderDebug.h"
+#include "EditorAssetLibrary.h"
+#include "ObjectTools.h"
+#include "AssetToolsModule.h"
+#include "AssetViewUtils.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 #define LOCTEXT_NAMESPACE "FQuickActionModule"
 DEFINE_LOG_CATEGORY(LogQuickActions);
@@ -36,6 +42,7 @@ TSharedRef<FExtender> FQuickActionModule::CustomCBExtender(const TArray<FString>
 	if (SelectedPaths.Num() > 0)
 	{
 		MenuExtender->AddMenuExtension(FName("Delete"), EExtensionHook::After, TSharedPtr<FUICommandList>(), FMenuExtensionDelegate::CreateRaw(this, &FQuickActionModule::AddCBMenuEntry));
+		SelectedFolderPaths = SelectedPaths;
 	}
 	return MenuExtender;
 }
@@ -52,7 +59,52 @@ void FQuickActionModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 
 void FQuickActionModule::OnDeleteUnusedAssetClicked()
 {
-	
+	if (SelectedFolderPaths.Num() > 1)
+	{
+		DebugHeader::ShowDialog(EAppMsgType::Ok, TEXT("Only one folder"));
+		return;
+	}
+
+	TArray<FString> AssetsPath = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0]);
+	if (AssetsPath.Num() == 0)
+	{
+		DebugHeader::ShowDialog(EAppMsgType::Ok, TEXT("Empty folder"));
+		return;
+	}
+
+	if (DebugHeader::ShowDialog(EAppMsgType::YesNo, TEXT("Found ") + FString::FromInt(AssetsPath.Num()) + TEXT(" assets\nProceed?")) == EAppReturnType::No)
+	{
+		return;
+	}
+
+	FixRedirectors();
+	TArray<FAssetData> UnusedAssets;
+	for (const FString& path : AssetsPath)
+	{
+		if (path.Contains(TEXT("Developers")) || path.Contains(TEXT("Collections"))) 
+		{
+			continue;
+		}
+		if (!UEditorAssetLibrary::DoesAssetExist(path))
+		{
+			continue;
+		}
+		if (UEditorAssetLibrary::FindPackageReferencersForAsset(path).IsEmpty())
+		{
+			const FAssetData unusedData = UEditorAssetLibrary::FindAssetData(path);
+			UnusedAssets.Add(unusedData);
+		}
+	}
+	if (UnusedAssets.Num() > 0)
+	{
+		const int32 deleteObjectsNum = ObjectTools::DeleteAssets(UnusedAssets);
+		if (deleteObjectsNum == 0) return;
+		DebugHeader::ShowNotifyInfo(TEXT("Succesfully deleted " + FString::FromInt(deleteObjectsNum) + " unused assets"));
+	}
+	else
+	{
+		DebugHeader::ShowDialog(EAppMsgType::Ok, TEXT("No unused assets"));
+	}
 }
 void FQuickActionModule::RegisterPngIcons(const FString& StyleSetName, const TMap<FString, FString>& IconMap, const FString& IconFolderPath)
 {
@@ -80,6 +132,41 @@ void FQuickActionModule::RegisterPngIcons(const FString& StyleSetName, const TMa
     {
         UE_LOG(LogTemp, Warning, TEXT("Style '%s' already exists. No changes made."), *StyleSetName);
     }
+}
+void FQuickActionModule::FixRedirectors()
+{
+	IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+	TArray<FAssetData> AssetList;
+
+	FARFilter Filter;
+	Filter.bRecursivePaths = true;
+	Filter.PackagePaths.Emplace("/Game");
+	Filter.ClassPaths.Add(UObjectRedirector::StaticClass()->GetClassPathName());
+
+	AssetRegistry.GetAssets(Filter, AssetList);
+
+	if (AssetList.Num() == 0) return;
+
+	TArray<FString> ObjectPaths;
+
+	for (const FAssetData& data : AssetList)
+	{
+		ObjectPaths.Add(data.GetObjectPathString());
+	}
+
+	TArray<UObject*> Objects;
+	bool Result = AssetViewUtils::LoadAssetsIfNeeded(ObjectPaths, Objects, true, true);
+	if (Result)
+	{
+		TArray<UObjectRedirector*> Redirectors;
+		for (UObject* object : Objects)
+		{
+			Redirectors.Add(CastChecked<UObjectRedirector>(object));
+		}
+
+		IAssetTools& AssetTool = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools")).Get();
+		AssetTool.FixupReferencers(Redirectors);
+	}
 }
 #pragma endregion
 void FQuickActionModule::ShutdownModule()

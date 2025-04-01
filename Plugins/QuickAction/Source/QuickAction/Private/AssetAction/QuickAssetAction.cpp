@@ -128,20 +128,20 @@ void UQuickAssetAction::RemoveUnused()
 {
 	FixRedirectors();
 	TArray<FAssetData> selectedAssets = UEditorUtilityLibrary::GetSelectedAssetData();
-	TArray<FAssetData> unuseAssets;
+	TArray<FAssetData> unusedAssets;
 	for (const FAssetData& data : selectedAssets)
 	{
 		if (UEditorAssetLibrary::FindPackageReferencersForAsset(data.ObjectPath.ToString()).IsEmpty())
 		{
-			unuseAssets.Add(data);
+			unusedAssets.Add(data);
 		}
 	}
-	if (unuseAssets.IsEmpty())
+	if (unusedAssets.IsEmpty())
 	{
 		DebugHeader::ShowDialog(EAppMsgType::Type::Ok, TEXT("No unused assets selected"));
 		return;
 	}
-	const int32 deleteObjectsNum = ObjectTools::DeleteAssets(unuseAssets);
+	const int32 deleteObjectsNum = ObjectTools::DeleteAssets(unusedAssets);
 	if (deleteObjectsNum == 0) return;
 	DebugHeader::ShowNotifyInfo(TEXT("Succesfully deleted " + FString::FromInt(deleteObjectsNum) + " unused assets"));
 }
