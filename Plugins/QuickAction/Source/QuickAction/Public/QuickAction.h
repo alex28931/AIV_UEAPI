@@ -25,4 +25,10 @@ private:
 	void RegisterPngIcons(const FString& StyleSetName, const TMap<FString, FString>& IconMap, const FString& IconFolderPath);
 	void FixRedirectors();
 #pragma endregion
+
+#pragma region SlateTest
+	void RegisterSlateTab();
+	void OnSpawnTabClicked();
+	TSharedRef<SDockTab> OnSpawnTab(const FSpawnTabArgs& args);
+#pragma endregion
 };

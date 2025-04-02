@@ -11,14 +11,16 @@
 #include "AssetToolsModule.h"
 #include "AssetViewUtils.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "SlateWidget/MyCustomWidget.h"
 
 #define LOCTEXT_NAMESPACE "FQuickActionModule"
 DEFINE_LOG_CATEGORY(LogQuickActions);
 
 void FQuickActionModule::StartupModule()
 {
-	InitCBExtension();
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	InitCBExtension();
+	RegisterSlateTab();
 }
 
 #pragma region CBExtension
@@ -54,6 +56,13 @@ void FQuickActionModule::AddCBMenuEntry(FMenuBuilder& MenuBuilder)
 		FText::FromString(TEXT("Delete UnusedAsset in folder")),
 		FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Delete"),
 		FExecuteAction::CreateRaw(this, &FQuickActionModule::OnDeleteUnusedAssetClicked)
+	);
+
+	MenuBuilder.AddMenuEntry(
+		FText::FromString(TEXT("Spawn test tab")),
+		FText::FromString(TEXT("Slate test nomad spawn")),
+		FSlateIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.Tabs.Details"),
+		FExecuteAction::CreateRaw(this, &FQuickActionModule::OnSpawnTabClicked)
 	);
 }
 
@@ -167,6 +176,25 @@ void FQuickActionModule::FixRedirectors()
 		IAssetTools& AssetTool = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools")).Get();
 		AssetTool.FixupReferencers(Redirectors);
 	}
+}
+#pragma endregion
+
+#pragma region SlateTest
+void FQuickActionModule::RegisterSlateTab()
+{
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FName("TestTab"), FOnSpawnTab::CreateRaw(this, &FQuickActionModule::OnSpawnTab)).SetDisplayName(FText::FromString(TEXT("Nomad tab test"))
+		);
+}
+void FQuickActionModule::OnSpawnTabClicked()
+{
+	FGlobalTabmanager::Get()->TryInvokeTab(FName("TestTab"));
+}
+TSharedRef<SDockTab> FQuickActionModule::OnSpawnTab(const FSpawnTabArgs& args)
+{
+	return SNew(SDockTab).TabRole(ETabRole::NomadTab)
+		[
+			SNew(SMyCustomWidget).TestString(TEXT("Test Data passing"))
+		];
 }
 #pragma endregion
 void FQuickActionModule::ShutdownModule()
