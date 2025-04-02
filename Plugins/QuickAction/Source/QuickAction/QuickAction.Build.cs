@@ -31,6 +31,7 @@ public class QuickAction : ModuleRules
                 "EditorScriptingUtilities",
 				"UnrealEd",
                 "AssetTools",
+				"InputCore",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

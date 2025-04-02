@@ -12,4 +12,14 @@ class SMyCustomWidget : public SCompoundWidget
 
 public:
 	void Construct(const FArguments& inArgs);
+
+protected:
+	bool CheckboxChecked;
+	
+	float value;
+	void HandleSliderValueChange(float NewValue);
+
+	TSharedRef<ITableRow> GenerateListRow(TSharedPtr<FString> item, const TSharedRef<STableViewBase> OwnerTable);
+	void HandleListSelectionChanged(TSharedPtr<FString> selectedItem, ESelectInfo::Type SelectInfo);
+
 };
