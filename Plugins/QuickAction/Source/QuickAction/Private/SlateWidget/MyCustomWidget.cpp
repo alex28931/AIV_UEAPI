@@ -11,44 +11,44 @@ void SMyCustomWidget::Construct(const FArguments& inArgs)
 	FSlateFontInfo TitleFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
 	TitleFont.Size = 30;
 
-	ChildSlot
-		[
-			SNew(SVerticalBox)
-			+SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					SNew(STextBlock)
-						.Text(FText::FromString(TEXT("My Custom Slate Tab")))
-						.Font(TitleFont)
-						.ColorAndOpacity(FColor::White)
-						.Justification(ETextJustify::Center)
-				]	
-			//+SVerticalBox::Slot()
-			//	.AutoHeight()
-			//	[
-			//		SNew(SHorizontalBox)
-			//		+SHorizontalBox::Slot()
-			//			[
-			//				SNew(SSlider)
-			//					.Value(0.5f)
-			//					.MinValue(0.0f)
-			//					.MaxValue(1.0f)
-			//					.OnValueChanged(HandleSliderValueChange)
-			//			]
-			//	]
-			+SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					SNew(SHorizontalBox)
-					+ SHorizontalBox::Slot()
-					[
-						SNew(const SListView<TSharedPtr<FString>>)
-							.ListItemsSource(&Option_CB)
-							.OnGenerateRow(this, &SMyCustomWidget::GenerateListRow)
-							.OnSelectionChanged(this, &SMyCustomWidget::HandleListSelectionChanged)
-					]
-			]
-		];
+	//ChildSlot
+	//	[
+	//		SNew(SVerticalBox)
+	//		+SVerticalBox::Slot()
+	//			.AutoHeight()
+	//			[
+	//				SNew(STextBlock)
+	//					.Text(FText::FromString(TEXT("My Custom Slate Tab")))
+	//					.Font(TitleFont)
+	//					.ColorAndOpacity(FColor::White)
+	//					.Justification(ETextJustify::Center)
+	//			]	
+	//		//+SVerticalBox::Slot()
+	//		//	.AutoHeight()
+	//		//	[
+	//		//		SNew(SHorizontalBox)
+	//		//		+SHorizontalBox::Slot()
+	//		//			[
+	//		//				SNew(SSlider)
+	//		//					.Value(0.5f)
+	//		//					.MinValue(0.0f)
+	//		//					.MaxValue(1.0f)
+	//		//					.OnValueChanged(HandleSliderValueChange)
+	//		//			]
+	//		//	]
+	//		+SVerticalBox::Slot()
+	//			.AutoHeight()
+	//			[
+	//				SNew(SHorizontalBox)
+	//				+ SHorizontalBox::Slot()
+	//				[
+	//					SNew(const SListView<TSharedPtr<FString>>)
+	//						.ListItemsSource(&Option_CB)
+	//						.OnGenerateRow(this, &SMyCustomWidget::GenerateListRow)
+	//						.OnSelectionChanged(this, &SMyCustomWidget::HandleListSelectionChanged)
+	//				]
+	//		]
+	//	];
 }
 
 void SMyCustomWidget::HandleSliderValueChange(float NewValue)

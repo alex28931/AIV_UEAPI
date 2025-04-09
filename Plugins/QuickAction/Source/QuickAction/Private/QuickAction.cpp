@@ -10,6 +10,7 @@
 #include "ObjectTools.h"
 #include "AssetToolsModule.h"
 #include "AssetViewUtils.h"
+#include "SExSplineInstantiatorWidget.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "SlateWidget/MyCustomWidget.h"
 
@@ -184,6 +185,14 @@ void FQuickActionModule::RegisterSlateTab()
 {
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FName("TestTab"), FOnSpawnTab::CreateRaw(this, &FQuickActionModule::OnSpawnTab)).SetDisplayName(FText::FromString(TEXT("Nomad tab test"))
 		);
+	
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FName("SplineSpawnerTab"), FOnSpawnTab::CreateLambda([](const FSpawnTabArgs& Arg)
+		{
+			return SNew(SDockTab).TabRole(ETabRole::NomadTab)
+				[
+					SNew(SExSplineInstantiatorWidget)
+				];
+		}));
 }
 void FQuickActionModule::OnSpawnTabClicked()
 {
