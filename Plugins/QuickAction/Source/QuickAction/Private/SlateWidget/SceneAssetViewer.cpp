@@ -3,6 +3,7 @@
 
 #include "SlateWidget/SceneAssetViewer.h"
 #include "EngineUtils.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 void SSceneAssetViewerWidget::Construct(const FArguments& inArgs)
 {
@@ -12,7 +13,7 @@ void SSceneAssetViewerWidget::Construct(const FArguments& inArgs)
 			SNew(SVerticalBox)
 				+ SVerticalBox::Slot()
 				[
-					SAssignNew(ListViewWidget, SListView<TSharedPtr<FString>>)
+					SAssignNew(ListViewWidget, SListView<TSharedPtr<ListAsset>>)
 						.ListItemsSource(&AssetsList)
 						.OnGenerateRow(this, &SSceneAssetViewerWidget::OnGenerateRow)
 				]
@@ -36,7 +37,7 @@ void SSceneAssetViewerWidget::PopulateAssetSet()
 				FString bpPathName = bp->GetPathName();
 				if (!BlueprintSet.Contains(bpPathName))
 				{
-					AssetsList.Add(MakeShared<FString>(bpPathName));
+					AssetsList.Add(MakeShared<ListAsset>(TEXT("Blueprint"), bpPathName));
 					BlueprintSet.Add(bp->GetPathName());
 				}
 			}
@@ -51,7 +52,7 @@ void SSceneAssetViewerWidget::PopulateAssetSet()
 						FString staticMeshPathName = staticMesh->GetPathName();
 						if (!MeshSet.Contains(staticMeshPathName))
 						{
-							AssetsList.Add(MakeShared<FString>(staticMeshPathName));
+							AssetsList.Add(MakeShared<ListAsset>(TEXT("Mesh"), staticMeshPathName));
 							MeshSet.Add(staticMesh->GetPathName());
 						}
 					}
@@ -62,7 +63,7 @@ void SSceneAssetViewerWidget::PopulateAssetSet()
 							FString materialPathName = material->GetPathName();
 							if (!MatSet.Contains(materialPathName))
 							{
-								AssetsList.Add(MakeShared<FString>(materialPathName));
+								AssetsList.Add(MakeShared<ListAsset>(TEXT("Material"), materialPathName));
 								MatSet.Add(material->GetPathName());
 							}
 						}
@@ -73,22 +74,36 @@ void SSceneAssetViewerWidget::PopulateAssetSet()
 	}
 }
 
-TSharedRef<ITableRow> SSceneAssetViewerWidget::OnGenerateRow(TSharedPtr<FString> item, const TSharedRef<STableViewBase>& OwnerTable)
+TSharedRef<ITableRow> SSceneAssetViewerWidget::OnGenerateRow(TSharedPtr<ListAsset> item, const TSharedRef<STableViewBase>& OwnerTable)
 {
 	return SNew(STableRow<TSharedPtr<FString>>, OwnerTable)
 		[
 			SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot().AutoWidth()
+				+ SHorizontalBox::Slot().FillWidth(0.3f)
 				[
 					SNew(STextBlock)
-						.Text(FText::FromString(*item))
+						.Text(FText::FromString((*item).Type))
 						.Justification(ETextJustify::InvariantLeft)
 				]
-				+ SHorizontalBox::Slot().AutoWidth()
+				+ SHorizontalBox::Slot().FillWidth(0.3f)
+				[
+					SNew(STextBlock)
+						.Text(FText::FromString((*item).Path))
+						.Justification(ETextJustify::InvariantLeft)
+				]
+				+ SHorizontalBox::Slot().FillWidth(0.3f)
 				[
 					SNew(SButton)
 						.Text(FText::FromString("Show in Content Browser"))
-						.OnClicked_Lambda([]()->FReply {return FReply::Handled(); })
+						.OnClicked_Lambda([item]()->FReply {
+							IAssetRegistry& AssetRegistryInterface  = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+							FAssetData AssetData = AssetRegistryInterface.GetAssetByObjectPath((*item).Path);
+							if (GEditor && AssetData.IsValid())
+							{
+								GEditor->SyncBrowserToObject(AssetData);
+							}
+							return FReply::Handled(); 
+						})
 				]
 		];
 }
