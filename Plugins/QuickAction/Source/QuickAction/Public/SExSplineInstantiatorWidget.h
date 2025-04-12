@@ -6,7 +6,7 @@
 #include "UObject/WeakObjectPtrTemplatesFwd.h"
 #include "Widgets/SCompoundWidget.h"
 
-class AActor;
+//class AActor;
 class USplineComponent;
 
 /**

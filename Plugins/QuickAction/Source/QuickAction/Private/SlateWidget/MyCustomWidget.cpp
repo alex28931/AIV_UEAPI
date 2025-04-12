@@ -3,6 +3,7 @@
 
 #include "SlateWidget/MyCustomWidget.h"
 #include "Widgets/Input/SSpinBox.h"
+#include "../HeaderDebug.h"
 
 void SMyCustomWidget::Construct(const FArguments& inArgs)
 {
