@@ -14,6 +14,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "SlateWidget/MyCustomWidget.h"
 #include "SlateWidget/SceneAssetViewer.h"
+#include "SlateWidget/LightUtilityWidget.h"
 
 #define LOCTEXT_NAMESPACE "FQuickActionModule"
 DEFINE_LOG_CATEGORY(LogQuickActions);
@@ -199,6 +200,13 @@ void FQuickActionModule::RegisterSlateTab()
 			return SNew(SDockTab).TabRole(ETabRole::NomadTab)
 				[
 					SNew(SExSplineInstantiatorWidget)
+				];
+		}));
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FName("LightUtility"), FOnSpawnTab::CreateLambda([](const FSpawnTabArgs& Arg)
+		{
+			return SNew(SDockTab).TabRole(ETabRole::NomadTab)
+				[
+					SNew(SLightUtilityWidget)
 				];
 		}));
 }

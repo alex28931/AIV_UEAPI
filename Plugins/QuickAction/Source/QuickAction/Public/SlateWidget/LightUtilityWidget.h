@@ -17,17 +17,17 @@ struct FLightItem
 };
 
 
-class SLishtUtilityWidget : public SCompoundWidget
+class SLightUtilityWidget : public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(SLishtUtilityWidget) {}
+	SLATE_BEGIN_ARGS(SLightUtilityWidget) {}
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& inArgs);
 private:
 	void RefreshLights();
+	void UpdateLightColor(LightType Type, int32 R, int32 G, int32 B);
 	TSharedRef<ITableRow> OnGenerateLightRow(TSharedPtr<FLightItem> item, const TSharedRef<STableViewBase>& OwnerTable);
-	FReply OnRowClicked(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent);
 	TSharedRef<SWidget> BuildLightControls(LightType Type);
 
 	TArray<TSharedPtr<FLightItem>> PointLightItems;
