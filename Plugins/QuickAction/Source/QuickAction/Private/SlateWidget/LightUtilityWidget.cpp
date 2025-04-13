@@ -184,7 +184,6 @@ TSharedRef<SWidget> SLightUtilityWidget::BuildLightControls(LightType Type)
 {
 	return SNew(SVerticalBox)
 
-		// Sezione per l'intensità
 		+ SVerticalBox::Slot().AutoHeight().Padding(0, 4)
 		[
 			SNew(STextBlock)
@@ -222,7 +221,7 @@ TSharedRef<SWidget> SLightUtilityWidget::BuildLightControls(LightType Type)
 		[
 			SNew(SHorizontalBox)
 
-				+ SHorizontalBox::Slot().AutoWidth().Padding(2)
+				+ SHorizontalBox::Slot().AutoWidth().Padding(2).VAlign(VAlign_Center)
 				[
 					SNew(STextBlock).Text(FText::FromString("R"))
 				]
@@ -238,7 +237,7 @@ TSharedRef<SWidget> SLightUtilityWidget::BuildLightControls(LightType Type)
 							})
 				]
 
-				+ SHorizontalBox::Slot().AutoWidth().Padding(2)
+				+ SHorizontalBox::Slot().AutoWidth().Padding(2).VAlign(VAlign_Center)
 				[
 					SNew(STextBlock).Text(FText::FromString("G"))
 				]
@@ -254,7 +253,7 @@ TSharedRef<SWidget> SLightUtilityWidget::BuildLightControls(LightType Type)
 							})
 				]
 
-				+ SHorizontalBox::Slot().AutoWidth().Padding(2)
+				+ SHorizontalBox::Slot().AutoWidth().Padding(2).VAlign(VAlign_Center)
 				[
 					SNew(STextBlock).Text(FText::FromString("B"))
 				]
