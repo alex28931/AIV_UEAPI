@@ -24,6 +24,7 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& inArgs);
+
 private:
 	void RefreshLights();
 	void UpdateLightColor(LightType Type, int32 R, int32 G, int32 B);

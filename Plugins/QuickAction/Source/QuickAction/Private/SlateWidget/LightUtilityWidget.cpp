@@ -103,6 +103,7 @@ void SLightUtilityWidget::RefreshLights()
 	SpotLightItems.Empty();
 	AreaLightItems.Empty();
 
+	if (!GEditor) return;
 	UWorld* World = GEditor->GetEditorWorldContext().World();
 	if (!World) return;
 	for (TActorIterator<AActor> ActorIt(World); ActorIt; ++ActorIt)
@@ -152,10 +153,9 @@ void SLightUtilityWidget::RefreshLights()
 			}
 		}
 	}
-
-	if (PointLightListView.IsValid()) PointLightListView->RequestListRefresh();
+	/*if (PointLightListView.IsValid()) PointLightListView->RequestListRefresh();
 	if (SpotLightListView.IsValid()) SpotLightListView->RequestListRefresh();
-	if (RectLightListView.IsValid()) RectLightListView->RequestListRefresh();
+	if (RectLightListView.IsValid()) RectLightListView->RequestListRefresh();*/
 }
 
 TSharedRef<ITableRow> SLightUtilityWidget::OnGenerateLightRow(TSharedPtr<FLightItem> Item, const TSharedRef<STableViewBase>& OwnerTable)
@@ -212,7 +212,7 @@ TSharedRef<SWidget> SLightUtilityWidget::BuildLightControls(LightType Type)
 						{
 							if (Item->bSelected && Item->Light.IsValid())
 							{
-								Item->Light->SetIntensity(NewValue * 1000.f); // Scala intensità arbitraria
+								Item->Light->SetIntensity(NewValue * 1000.f);
 							}
 						}
 					})
